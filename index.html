@@ -213,21 +213,31 @@ yarn add react-alatpay
                                 </code></pre>
                             </div>
                              <div id="react-configure" class="code-tab-content hidden">
-                                <pre class="code-block"><code>import UseALATPay from 'react-alatpay';
+                                                               <pre class="code-block"><code>import React, { useState } from 'react';
+import UseALATPay from 'react-alatpay';
 
 function FundWalletButton() {
+  // Placeholder for API keys (would be from .env in a real app)
+  const ALATPAY_API_KEY = 'api_test_YOUR_API_KEY';
+  const ALATPAY_BUSINESS_ID = 'id_test_YOUR_BUSINESS_ID';
+
   const config = {
-    publicKey: 'pk_test_YOUR_PUBLIC_KEY',
+    apiKey: ALATPAY_API_KEY,
+    businessId: ALATPAY_BUSINESS_ID,
     amount: 500000, // 5,000.00 NGN in kobo
     email: 'user@savingspocket.com',
     reference: `savings_${Date.now()}`,
     currency: 'NGN',
+    firstName: "John",
+    lastName: "Doe",
+    color: "#bf0a25", // ALATPay brand color
     metadata: {
       pocket_id: 'pocket_abc_123'
     },
+    phone: "08012345678",
   };
   
-  const initializePayment = useAlatPay(config);
+  const initializePayment = UseALATPay(config); // Use UseALATPay directly
 
   const handleFundClick = () => {
     initializePayment({
@@ -351,7 +361,7 @@ function CheckoutButton({ orderId, totalAmount, customerEmail }) {
 }
 
 export default CheckoutButton;
-</code></pre>
+                              </code></pre>
                             </div>
                              <div id="api-backend" class="code-tab-content hidden">
                                 <pre class="code-block"><code>// backend/src/server.ts (Conceptual Node.js/Express with TypeScript)
@@ -454,7 +464,7 @@ app.listen(PORT, () => {
                             <div class="mt-2 font-mono text-sm bg-white p-3 rounded">
                                 <p><strong>Bank:</strong> Wema Bank</p>
                                 <p><strong>Account Name:</strong> ALATPay/Snacks Store</p>
-                                <p><strong>Account Number:</strong> 9876543210</p>
+                                <p><strong>Account Number:</strong> 8880137110</p>
                                 <p><strong>Amount:</strong> NGN 2,500.00</p>
                             </div>
                         </div>
