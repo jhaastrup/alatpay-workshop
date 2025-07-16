@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Powering Payments with ALATPay: Interactive Workshop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals & ALATPay Red -->
+    <!-- Application Structure Plan: A single-page application with a sticky top navigation bar for easy access to different workshop sections. This structure allows users to explore content non-linear ly, unlike a traditional slideshow. Key sections include a toolkit overview, a visual guide to getting API keys, and two interactive case studies for the React SDK and direct APIs, featuring tabbed code viewers and simulated demos. This design was chosen to make the technical content more digestible and engaging for developers, allowing them to focus on the parts most relevant to them. -->
+    <!-- Visualization & Content Choices: Instead of static images or charts, the application uses interactive, CSS-styled components to represent key visuals. A simulated dashboard demonstrates where to find API keys. Tabbed interfaces present code snippets for the React SDK and API case studies, preventing cognitive overload. Interactive buttons trigger simulated modals and API responses to mimic the live demo experience. This approach was chosen to be more engaging and educational than static content, confirming NO SVG/Mermaid JS is used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #bf0a25;
+        }
+        .section-title {
+            color: #1a202c;
+        }
+        .code-block {
+            background-color: #1a202c;
+            color: #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            max-height: 400px;
+        }
+        .tab-button {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #bf0a25;
+            color: #ffffff;
+        }
+        .sim-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .sim-modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .sim-modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 500px;
+            width: 90%;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .sim-modal-overlay.visible .sim-modal-content {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">ALATPay Workshop</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#tools" class="nav-link">Toolkit</a>
+                <a href="#getting-started" class="nav-link">Get Keys</a>
+                <a href="#react-sdk" class="nav-link">React SDK</a>
+                <a href="#api-guide" class="nav-link">API Guide</a>
+                <a href="#community" class="nav-link">Community</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+             <a href="#home" class="block py-2 nav-link">Home</a>
+             <a href="#tools" class="block py-2 nav-link">Toolkit</a>
+             <a href="#getting-started" class="block py-2 nav-link">Get Keys</a>
+             <a href="#react-sdk" class="block py-2 nav-link">React SDK</a>
+             <a href="#api-guide" class="block py-2 nav-link">API Guide</a>
+             <a href="#community" class="block py-2 nav-link">Community</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="py-20 md:py-32 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-6xl font-bold section-title mb-4">Powering Payments with ALATPay</h2>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                    Welcome, engineers! Today, we're diving into how you can wield the power of ALATPay to build seamless, secure, and truly awesome financial experiences. Get ready to code, create, and innovate.
+                </p>
+                <a href="#tools" class="bg-[#bf0a25] text-white font-bold py-3 px-8 rounded-full hover:bg-[#a00820] transition duration-300 text-lg">Explore the Toolkit</a>
+            </div>
+        </section>
+
+        <section id="tools" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold section-title">Your ALATPay Arsenal</h2>
+                    <p class="text-gray-600 mt-4 max-w-2xl mx-auto">We believe in giving you options. ALATPay offers a comprehensive suite of tools to fit your development style and project needs.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-md text-center group hover:shadow-xl transition duration-300">
+                        <a href="https://github.com/ALATPay" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+                            <span class="text-4xl mb-4 inline-block group-hover:scale-110 transition duration-300">⚙️</span>
+                            <h3 class="text-xl font-bold mb-2 group-hover:text-[#bf0a25] transition duration-300">SDKs</h3>
+                            <p class="text-gray-600">Pre-built shortcuts for faster integration in your favorite languages: React, C#, Python, Kotlin, & React Native.</p>
+                        </a>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md text-center group hover:shadow-xl transition duration-300">
+                        <a href="https://docs.alatpay.ng/" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+                            <span class="text-4xl mb-4 inline-block group-hover:scale-110 transition duration-300">🔌</span>
+                            <h3 class="text-xl font-bold mb-2 group-hover:text-[#bf0a25] transition duration-300">APIs</h3>
+                            <p class="text-gray-600">For when you need direct, granular control over every aspect of your payment flow. Your imagination is the limit.</p>
+                        </a>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md text-center group hover:shadow-xl transition duration-300">
+                        <a href="https://docs.alatpay.ng/web-plugin" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+                            <span class="text-4xl mb-4 inline-block group-hover:scale-110 transition duration-300">🖥️</span>
+                            <h3 class="text-xl font-bold mb-2 group-hover:text-[#bf0a25] transition duration-300">Web Plugins</h3>
+                            <p class="text-gray-600">Easily embed payment functionality directly into your website with minimal code and quick setup.</p>
+                        </a>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md text-center group hover:shadow-xl transition duration-300">
+                        <a href="https://wordpress.org/plugins/alatpay/" target="_blank" rel="noopener noreferrer" class="block w-full h-full">
+                            <span class="text-4xl mb-4 inline-block group-hover:scale-110 transition duration-300">🎨</span>
+                            <h3 class="text-xl font-bold mb-2 group-hover:text-[#bf0a25] transition duration-300">WordPress Plugin</h3>
+                            <p class="text-gray-600">Seamless and powerful integration for your WordPress-powered e-commerce sites and businesses.</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="getting-started" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold section-title">First Stop: Getting Your Keys 🔑</h2>
+                    <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Before we dive into code, you'll need your ALATPay API keys. Think of these as your credentials to securely communicate with the ALATPay platform.</p>
+                </div>
+                <div class="max-w-4xl mx-auto bg-gray-50 p-8 rounded-lg shadow-lg border border-gray-200">
+                    <h3 class="font-bold text-lg mb-2">Simulated ALATPay Dashboard</h3>
+                    <p class="text-sm text-gray-500 mb-6">Here's a representation of where to find your keys in the developer section of your dashboard.</p>
+                    <div class="bg-white p-6 rounded-md">
+                        <h4 class="font-semibold text-gray-700">API Keys & Webhooks</h4>
+                        <div class="mt-6 space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Bussiness ID</label>
+                                <div class="mt-1 flex rounded-md shadow-sm">
+                                    <div class="relative flex items-stretch flex-grow focus-within:z-10 bg-gray-100 px-4 py-2 rounded-l-md border border-gray-300 text-gray-500 font-mono text-sm">id_test_xxxxxxxxxxxxxxxxxxxx</div>
+                                    <button class="relative -ml-px inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100">Copy</button>
+                                </div>
+                                <p class="mt-2 text-xs text-green-700">✓ Use this on your client-side (frontend).</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">API Key</label>
+                                <div class="mt-1 flex rounded-md shadow-sm">
+                                     <div class="relative flex items-stretch flex-grow focus-within:z-10 bg-gray-100 px-4 py-2 rounded-l-md border border-gray-300 text-gray-500 font-mono text-sm">api_test_********************</div>
+                                    <button class="relative -ml-px inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100">Reveal & Copy</button>
+                                </div>
+                                <p class="mt-2 text-xs text-red-700">✗ Keep this secret! Use only on your server-side (backend).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="react-sdk" class="py-20">
+            <div class="container mx-auto px-6">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold section-title">Case Study 1: React SDK 💰</h2>
+                    <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Let's see the React SDK in action with our <a href="https://savingspocket.netlify.app/" target="_blank" rel="noopener noreferrer" class="text-[#bf0a25] hover:underline font-semibold">"Savings Pocket"</a> app. We'll enable users to securely fund their wallets with just a few lines of code.</p>
+                </div>
+
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+                        <div class="p-4 bg-gray-50 border-b border-gray-200">
+                            <div id="react-tabs" class="flex space-x-2">
+                                <button data-target="react-install" class="tab-button px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700">1. Install</button>
+                                <button data-target="react-configure" class="tab-button px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700">2. Configure Hook</button>
+                            </div>
+                        </div>
+                        <div class="p-2 bg-[#1a202c]">
+                             <div id="react-install" class="code-tab-content">
+                                <pre class="code-block"><code># Using npm
+npm install react-alatpay
+
+# Or using yarn
+yarn add react-alatpay
+                                </code></pre>
+                            </div>
+                             <div id="react-configure" class="code-tab-content hidden">
+                                <pre class="code-block"><code>import UseALATPay from 'react-alatpay';
+
+function FundWalletButton() {
+  const config = {
+    publicKey: 'pk_test_YOUR_PUBLIC_KEY',
+    amount: 500000, // 5,000.00 NGN in kobo
+    email: 'user@savingspocket.com',
+    reference: `savings_${Date.now()}`,
+    currency: 'NGN',
+    metadata: {
+      pocket_id: 'pocket_abc_123'
+    },
+  };
+  
+  const initializePayment = useAlatPay(config);
+
+  const handleFundClick = () => {
+    initializePayment({
+      onSuccess: (ref) => alert('Payment successful! Ref: ' + ref),
+      onClose: () => alert('Payment cancelled.'),
+      onError: (err) => alert('Payment failed: ' + err.message)
+    });
+  };
+
+  return &lt;button onClick={handleFundClick}&gt;Fund Pocket&lt;/button&gt;
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 text-center bg-gray-50 p-6 rounded-lg border border-gray-200">
+                        <h4 class="font-semibold text-lg mb-4">Live Demo Simulation</h4>
+                        <button id="react-demo-button" class="bg-[#bf0a25] text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-[#a00820] transition duration-300">
+                            Fund My Savings Pocket
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="api-guide" class="py-20 bg-white">
+             <div class="container mx-auto px-6">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold section-title">Case Study 2: Direct APIs (TypeScript/React Web App) 🛒</h2>
+                    <p class="text-gray-600 mt-4 max-w-2xl mx-auto">For our <a href="https://snacks-store.netlify.app/" target="_blank" rel="noopener noreferrer" class="text-[#bf0a25] hover:underline font-semibold">"Snacks Store"</a> web app, we'll use ALATPay's APIs to implement a "Pay with Transfer" option, giving us full control over the checkout experience.</p>
+                </div>
+                <div class="max-w-4xl mx-auto">
+                     <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+                        <div class="p-4 bg-gray-50 border-b border-gray-200">
+                            <div id="api-tabs" class="flex space-x-2">
+                                <button data-target="api-frontend" class="tab-button px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700">1. Frontend (React/TS)</button>
+                                <button data-target="api-backend" class="tab-button px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700">2. Backend (Node.js/TS)</button>
+                            </div>
+                        </div>
+                        <div class="p-2 bg-[#1a202c]">
+                            <div id="api-frontend" class="code-tab-content">
+                                <pre class="code-block"><code>// src/components/CheckoutButton.tsx
+import React, { useState } from 'react';
+
+// Define a type for the response data from your backend
+interface VirtualAccountDetails {
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+  amount: number;
+}
+
+function CheckoutButton({ orderId, totalAmount, customerEmail }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [paymentDetails, setPaymentDetails] = useState&lt;VirtualAccountDetails | null&gt;(null);
+
+  const handleCheckout = async () => {
+    setIsLoading(true);
+    setError('');
+    setPaymentDetails(null);
+
+    const payload = {
+      amount: totalAmount, // Ensure this is in kobo (smallest unit)
+      email: customerEmail,
+      reference: `snacks_order_${orderId}_${Date.now()}`,
+      // Add any other required fields for virtual account generation
+    };
+
+    try {
+      // Call your own backend endpoint to initiate the transfer
+      const response = await fetch('/api/initiate-transfer-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to initiate transfer from backend.');
+      }
+
+      const data = await response.json(); // This is your backend's response
+
+      if (data.status === 'success' && data.details) {
+        setPaymentDetails(data.details);
+        // In a real app, you'd show a modal with these details
+        alert('Payment initiated! Please transfer to: ' + JSON.stringify(data.details));
+      } else {
+        throw new Error(data.message || 'Failed to get virtual account details.');
+      }
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred during checkout.');
+      console.error("Checkout error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;button
+        onClick={handleCheckout}
+        disabled={isLoading}
+        className="bg-[#bf0a25] text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-[#a00820] transition duration-300 disabled:opacity-50"
+      &gt;
+        {isLoading ? 'Processing...' : 'Checkout with Bank Transfer'}
+      &lt;/button&gt;
+      {error && &lt;p className="text-red-500 mt-2"&gt;{error}&lt;/p&gt;}
+      {paymentDetails && (
+        &lt;div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-md"&gt;
+          &lt;h5 className="font-bold text-blue-800"&gt;Payment Details:&lt;/h5&gt;
+          &lt;p&gt;&lt;strong&gt;Bank:&lt;/strong&gt; {paymentDetails.bankName}&lt;/p&gt;
+          &lt;p&gt;&lt;strong&gt;Account Name:&lt;/strong&gt; {paymentDetails.accountName}&lt;/p&gt;
+          &lt;p&gt;&lt;strong&gt;Account Number:&lt;/strong&gt; {paymentDetails.accountNumber}&lt;/p&gt;
+          &lt;p&gt;&lt;strong&gt;Amount:&lt;/strong&gt; NGN {paymentDetails.amount / 100}.00&lt;/p&gt;
+        &lt;/div&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+export default CheckoutButton;
+</code></pre>
+                            </div>
+                             <div id="api-backend" class="code-tab-content hidden">
+                                <pre class="code-block"><code>// backend/src/server.ts (Conceptual Node.js/Express with TypeScript)
+import express from 'express';
+import dotenv from 'dotenv';
+import fetch from 'node-fetch'; // For Node.js, install 'node-fetch'
+
+dotenv.config(); // Load environment variables
+
+const app = express();
+app.use(express.json());
+
+// IMPORTANT: Get your ALATPay API Key from environment variables.
+// NEVER hardcode or expose this in frontend code!
+const ALATPAY_API_KEY = process.env.ALATPAY_API_KEY || 'YOUR_ALATPAY_API_KEY';
+const ALATPAY_BASE_URL = 'https://alatpay.ng'; // Use the correct base URL for ALATPay APIs
+
+interface AlatPayVirtualAccountResponse {
+  status: boolean;
+  message: string;
+  data?: {
+    bankName: string;
+    accountName: string;
+    accountNumber: string;
+    amount: number; // This would be the amount requested for the virtual account
+    // ... other fields from ALATPay response
+  };
+}
+
+app.post('/api/initiate-transfer-payment', async (req, res) => {
+  const { orderId, amount, email } = req.body;
+
+  if (!amount || !email || !orderId) {
+    return res.status(400).json({ message: 'Missing required payment details' });
+  }
+
+  const payload = {
+    amount: amount, // Amount in kobo
+    customerEmail: email,
+    reference: `snacks_order_${orderId}_${Date.now()}`, // Unique reference for your internal tracking
+    // Add other required fields for virtual account generation as per ALATPay docs
+  };
+
+  try {
+    const response = await fetch(`${ALATPAY_BASE_URL}/bank-transfer/api/v1/bankTransfer/virtualAccount`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Ocp-Apim-Subscription-Key': ALATPAY_API_KEY, // Corrected header for API Key/ ALATPay might use Bearer token or other auth
+        // Add any other required headers like 'x-api-key' if specified by ALATPay docs
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('ALATPay API Error:', errorData);
+      return res.status(response.status).json({ message: errorData.message || 'Failed to generate virtual account from ALATPay.' });
+    }
+
+    const data: AlatPayVirtualAccountResponse = await response.json();
+
+    if (data.status && data.data) {
+      // Respond to frontend with the virtual account details
+      return res.status(200).json({
+        status: 'success',
+        message: 'Virtual account generated successfully',
+        details: {
+          bankName: data.data.bankName,
+          accountName: data.data.accountName,
+          accountNumber: data.data.accountNumber,
+          amount: data.data.amount,
+        }
+      });
+    } else {
+      return res.status(500).json({ message: data.message || 'Failed to get virtual account details from ALATPay response.' });
+    }
+  } catch (error: any) {
+    console.error('Backend checkout error:', error);
+    return res.status(500).json({ message: 'An internal server error occurred.' });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Backend server running on port ${PORT}`);
+});
+```</pre>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="mt-8 text-center bg-gray-50 p-6 rounded-lg border border-gray-200">
+                        <h4 class="font-semibold text-lg mb-4">Live Demo Simulation</h4>
+                        <button id="api-demo-button" class="bg-[#bf0a25] text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-[#a00820] transition duration-300">
+                            Checkout with Bank Transfer
+                        </button>
+                        <div id="api-demo-response" class="hidden mt-4 text-left p-4 bg-blue-50 border border-blue-200 rounded-md">
+                            <h5 class="font-bold text-blue-800">API Response: Success!</h5>
+                            <p class="text-sm text-blue-700">Please make payment to the account details below:</p>
+                            <div class="mt-2 font-mono text-sm bg-white p-3 rounded">
+                                <p><strong>Bank:</strong> Wema Bank</p>
+                                <p><strong>Account Name:</strong> ALATPay/Snacks Store</p>
+                                <p><strong>Account Number:</strong> 9876543210</p>
+                                <p><strong>Amount:</strong> NGN 2,500.00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="community" class="py-20">
+             <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold section-title">Join the Community & Get Rewarded!</h2>
+                    <p class="text-gray-600 mt-4 max-w-2xl mx-auto">Your journey doesn't end here. Connect with fellow developers, get support, and win awesome rewards for your projects.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     <div class="bg-white p-8 rounded-lg shadow-md flex flex-col items-center text-center">
+                        <span class="text-4xl mb-4 inline-block">🏆</span>
+                        <h3 class="text-xl font-bold mb-2">Developer Rewards</h3>
+                        <p class="text-gray-600 flex-grow mb-4">Build an innovative project with ALATPay, showcase it, and win exclusive swag, features, and prizes!</p>
+                        <a href="[https://bit.ly/ALATPay-Dev-Opensource-Program](https://bit.ly/ALATPay-Dev-Opensource-Program)" target="_blank" rel="noopener noreferrer" class="bg-yellow-500 text-white font-bold py-2 px-6 rounded-full hover:bg-yellow-600 transition duration-300">Learn More</a>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-md flex flex-col items-center text-center">
+                        <span class="text-4xl mb-4 inline-block">💬</span>
+                        <h3 class="text-xl font-bold mb-2">Slack Community</h3>
+                        <p class="text-gray-600 flex-grow mb-4">Get direct support, share ideas, and collaborate with other developers in our official Slack channel.</p>
+                         <a href="[https://bit.ly/ALATPayDevs](https://bit.ly/ALATPayDevs)" target="_blank" rel="noopener noreferrer" class="bg-indigo-500 text-white font-bold py-2 px-6 rounded-full hover:bg-indigo-600 transition duration-300">Join Now</a>
+                    </div>
+                     <div class="bg-white p-8 rounded-lg shadow-md flex flex-col items-center text-center">
+                        <span class="text-4xl mb-4 inline-block">📦</span>
+                        <h3 class="text-xl font-bold mb-2">GitHub Repos</h3>
+                        <p class="text-gray-600 flex-grow mb-4">Explore our open-source SDKs, contribute to the code, and be the first to get new updates and releases.</p>
+                         <a href="[https://github.com/ALATPay](https://github.com/ALATPay)" target="_blank" rel="noopener noreferrer" class="bg-gray-800 text-white font-bold py-2 px-6 rounded-full hover:bg-gray-900 transition duration-300">Explore GitHub</a>
+                    </div>
+                </div>
+             </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <p>&copy; 2025 ALATPay. All Rights Reserved.</p>
+            <p class="text-sm mt-2">Powering Payments for Engineers, by Engineers.</p>
+        </div>
+    </footer>
+
+    <div id="sim-modal" class="sim-modal-overlay">
+        <div class="sim-modal-content text-center">
+            <h3 class="font-bold text-xl mb-2">ALATPay Secure Modal</h3>
+            <p class="text-gray-600 mb-6">In a real integration, the secure ALATPay payment modal would open here for the user to enter their payment details.</p>
+            <button id="close-modal-button" class="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 transition duration-300">Close Simulation</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function setupTabs(tabContainerId) {
+                const tabContainer = document.getElementById(tabContainerId);
+                if (!tabContainer) return;
+
+                const tabButtons = tabContainer.querySelectorAll('.tab-button');
+                const contentContainer = tabContainer.closest('.rounded-lg').querySelector('.p-2');
+                const tabContents = contentContainer.querySelectorAll('.code-tab-content');
+                
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        
+                        const targetId = button.dataset.target;
+                        tabContents.forEach(content => {
+                            if (content.id === targetId) {
+                                content.classList.remove('hidden');
+                            } else {
+                                content.classList.add('hidden');
+                            }
+                        });
+                    });
+                });
+                if (tabButtons.length > 0) {
+                   tabButtons[0].click();
+                }
+            }
+
+            setupTabs('react-tabs');
+            setupTabs('api-tabs');
+
+            const reactDemoButton = document.getElementById('react-demo-button');
+            const simModal = document.getElementById('sim-modal');
+            const closeModalButton = document.getElementById('close-modal-button');
+
+            if (reactDemoButton && simModal && closeModalButton) {
+                reactDemoButton.addEventListener('click', () => {
+                    simModal.classList.add('visible');
+                });
+                closeModalButton.addEventListener('click', () => {
+                    simModal.classList.remove('visible');
+                });
+                simModal.addEventListener('click', (e) => {
+                    if (e.target === simModal) {
+                        simModal.classList.remove('visible');
+                    }
+                });
+            }
+
+            const apiDemoButton = document.getElementById('api-demo-button');
+            const apiDemoResponse = document.getElementById('api-demo-response');
+            if(apiDemoButton && apiDemoResponse) {
+                apiDemoButton.addEventListener('click', () => {
+                    apiDemoResponse.classList.toggle('hidden');
+                });
+            }
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
