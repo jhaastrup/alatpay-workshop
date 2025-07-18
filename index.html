@@ -245,16 +245,7 @@ function FundWalletButton() {
   }
 
 
-
-  const handleFundClick = () => {
-    initializePayment({
-      onSuccess: (ref) => alert('Payment successful! Ref: ' + ref),
-      onClose: () => alert('Payment cancelled.'),
-      onError: (err) => alert('Payment failed: ' + err.message)
-    });
-  };
-
-  return &lt;button onClick={handleFundClick}&gt;Fund Pocket&lt;/button&gt;
+  return &lt;button onClick={initializePayment()}&gt;Fund Pocket&lt;/button&gt;
 }</code></pre>
                             </div>
                         </div>
@@ -308,7 +299,7 @@ function CheckoutButton({ orderId, totalAmount, customerEmail }) {
     setPaymentDetails(null);
 
     const payload = {
-      amount: totalAmount, // Ensure this is in kobo (smallest unit)
+      amount: totalAmount,
       email: customerEmail,
       reference: `snacks_order_${orderId}_${Date.now()}`,
       // Add any other required fields for virtual account generation
@@ -396,20 +387,38 @@ interface AlatPayVirtualAccountResponse {
     amount: number; // This would be the amount requested for the virtual account
     // ... other fields from ALATPay response
   };
+} 
+
+interface AlatPayTransactionStatusResponse {
+  status: boolean;
+  message: string; 
+  
+  data?: { 
+    "id": string
+    "merchantId": string
+    "businessId": string
+    "channel": string
+    transactionId: string;
+    // ... other transaction details
+  };
 }
 
-app.post('/api/initiate-transfer-payment', async (req, res) => {
-  const { orderId, amount, email } = req.body;
-
-  if (!amount || !email || !orderId) {
-    return res.status(400).json({ message: 'Missing required payment details' });
-  }
+app.post('/api/initiate-transfer-payments', async (req, res) => {
 
   const payload = {
-    amount: amount, // Amount in kobo
-    customerEmail: email,
-    reference: `snacks_order_${orderId}_${Date.now()}`, // Unique reference for your internal tracking
-    // Add other required fields for virtual account generation as per ALATPay docs
+     businessId: ALATPAY_BUSINESS_ID,
+      amount: totalAmount,
+      currency: "NGN",
+      orderId: orderId,
+      description: `Snacks Order #${orderId}`,
+      customer: {
+        email: customerEmail,
+        phone: customerPhone,
+        firstName: customerFirstName,
+        lastName: customerLastName,
+        metadata: "Snacks Store Checkout",
+      },
+
   };
 
   try {
@@ -417,8 +426,7 @@ app.post('/api/initiate-transfer-payment', async (req, res) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Ocp-Apim-Subscription-Key': ALATPAY_API_KEY, // Corrected header for API Key/ ALATPay might use Bearer token or other auth
-        // Add any other required headers like 'x-api-key' if specified by ALATPay docs
+        'Ocp-Apim-Subscription-Key': ALATPAY_API_KEY,
       },
       body: JSON.stringify(payload),
     });
@@ -448,6 +456,45 @@ app.post('/api/initiate-transfer-payment', async (req, res) => {
     }
   } catch (error: any) {
     console.error('Backend checkout error:', error);
+    return res.status(500).json({ message: 'An internal server error occurred.' });
+  }
+}); 
+
+// Endpoint to check the status of a bank transfer transaction
+app.get('/api/check-transfer-status', async (req, res) => {
+  const { transactionId } = req.params;
+
+  if (!transactionId) {
+    return res.status(400).json({ message: 'Missing transactionId' });
+  }
+
+  try {
+    const response = await fetch(`${ALATPAY_BASE_URL}/bank-transfer/api/v1/bankTransfer/transactions/${transactionId}`, {
+      method: 'GET',
+      headers: {
+        'Ocp-Apim-Subscription-Key': ALATPAY_API_KEY,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('ALATPay API Error (Transaction Status):', errorData);
+      return res.status(response.status).json({ message: errorData.message || 'Failed to fetch transaction status from ALATPay.' });
+    }
+
+    const data: AlatPayTransactionStatusResponse = await response.json();
+
+    if (data.status && data.data) {
+      return res.status(200).json({
+        status: 'success',
+        message: 'Transaction status retrieved successfully',
+        transaction: data.data
+      });
+    } else {
+      return res.status(500).json({ message: data.message || 'Failed to get transaction status from ALATPay response.' });
+    }
+  } catch (error: any) {
+    console.error('Backend transaction status check error:', error);
     return res.status(500).json({ message: 'An internal server error occurred.' });
   }
 });
