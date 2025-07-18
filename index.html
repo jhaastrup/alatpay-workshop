@@ -169,18 +169,18 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Bussiness ID</label>
                                 <div class="mt-1 flex rounded-md shadow-sm">
-                                    <div class="relative flex items-stretch flex-grow focus-within:z-10 bg-gray-100 px-4 py-2 rounded-l-md border border-gray-300 text-gray-500 font-mono text-sm">id_test_xxxxxxxxxxxxxxxxxxxx</div>
+                                    <div class="relative flex items-stretch flex-grow focus-within:z-10 bg-gray-100 px-4 py-2 rounded-l-md border border-gray-300 text-gray-500 font-mono text-sm">582418f7-_xxxxxxxxxxxxxxxxxxxx</div>
                                     <button class="relative -ml-px inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100">Copy</button>
                                 </div>
-                                <p class="mt-2 text-xs text-green-700">✓ Use this on your client-side (frontend).</p>
+                                <p class="mt-2 text-xs text-green-700">✓ Keep this a secret!</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">API Key</label>
                                 <div class="mt-1 flex rounded-md shadow-sm">
-                                     <div class="relative flex items-stretch flex-grow focus-within:z-10 bg-gray-100 px-4 py-2 rounded-l-md border border-gray-300 text-gray-500 font-mono text-sm">api_test_********************</div>
+                                     <div class="relative flex items-stretch flex-grow focus-within:z-10 bg-gray-100 px-4 py-2 rounded-l-md border border-gray-300 text-gray-500 font-mono text-sm">3c0b88ae2_xxxxxxxxxxxxxxxxxxxx</div>
                                     <button class="relative -ml-px inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100">Reveal & Copy</button>
                                 </div>
-                                <p class="mt-2 text-xs text-red-700">✗ Keep this secret! Use only on your server-side (backend).</p>
+                                <p class="mt-2 text-xs text-red-700">✗ Keep this secret! Use only on your server-side</p>
                             </div>
                         </div>
                     </div>
@@ -221,23 +221,30 @@ function FundWalletButton() {
   const ALATPAY_API_KEY = 'api_test_YOUR_API_KEY';
   const ALATPAY_BUSINESS_ID = 'id_test_YOUR_BUSINESS_ID';
 
-  const config = {
+  const config = UseALATPay({
     apiKey: ALATPAY_API_KEY,
     businessId: ALATPAY_BUSINESS_ID,
-    amount: 500000, // 5,000.00 NGN in kobo
-    email: 'user@savingspocket.com',
-    reference: `savings_${Date.now()}`,
-    currency: 'NGN',
-    firstName: "John",
-    lastName: "Doe",
-    color: "#bf0a25", // ALATPay brand color
-    metadata: {
-      pocket_id: 'pocket_abc_123'
+    amount: 100,
+    apiKey: "14feff9729184eb09e0385184efc1816", 
+    businessId: "582418f7-032f-48ca-27c8-08dcd31fac98", 
+    currency: "NGN",
+    email: "john.doe@gmail.com", 
+    firstName:'John',
+    lastName:'Doe', 
+    metadata:{},   
+    phone:'09099912345',
+    onClose: () => {
+      console.log("Payment popup closed")},
+    onTransaction: (response:any) => {
+      console.log("Transaction response:", response);
     },
-    phone: "08012345678",
-  };
-  
-  const initializePayment = UseALATPay(config); // Use UseALATPay directly
+  }) 
+
+  const initializePayment=()=>{
+   config.submit()
+  }
+
+
 
   const handleFundClick = () => {
     initializePayment({
@@ -513,7 +520,7 @@ app.listen(PORT, () => {
     <div id="sim-modal" class="sim-modal-overlay">
         <div class="sim-modal-content text-center">
             <h3 class="font-bold text-xl mb-2">ALATPay Secure Modal</h3>
-            <p class="text-gray-600 mb-6">In a real integration, the secure ALATPay payment modal would open here for the user to enter their payment details.</p>
+            <p class="text-gray-600 mb-6">In a real integration, the secure ALATPay payment modal would open here for the user to fund their account</p>
             <button id="close-modal-button" class="bg-gray-200 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 transition duration-300">Close Simulation</button>
         </div>
     </div>
